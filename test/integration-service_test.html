@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
+
+    <title>integration-service test</title>
+
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+    <script src="../../web-component-tester/browser.js"></script>
+
+    <link rel="import" href="../integration-service.html">
+  </head>
+  <body>
+    <test-fixture id="basic">
+      <template>
+        <integration-service></integration-service>
+      </template>
+    </test-fixture>
+
+    <test-fixture id="configured">
+      <template>
+        <integration-service
+          integrations-url="/api/views"
+          token="123">
+        </integration-service>
+      </template>
+    </test-fixture>
+
+    <test-fixture id="working">
+      <template>
+        <integration-service
+          integrations-url="https://integration-master.run.aws-usw02-pr.ice.predix.io">
+        </integration-service>
+      </template>
+    </test-fixture>
+
+    <script>
+
+    describe('integration-service', function() {
+      var xhr, requests, element;
+      var integrationID;
+      var body;
+
+      beforeEach(function() {
+        xhr = sinon.useFakeXMLHttpRequest();
+        requests=[];
+        xhr.onCreate = function (xhr) {
+          requests.push(xhr);
+        }
+      });
+
+      afterEach(function() {
+        xhr.restore();
+      });
+      describe('initalizations without data', function() {
+        element = fixture('basic');
+
+        it('should instantiate properly without response data', function() {     
+         assert.equal(element.is, 'integration-service');
+         assert.equal(element.integrationsUrl, 'https://integration-master.run.aws-usw02-pr.ice.predix.io');
+         assert.equal(element.token, undefined);
+        });
+      });
+      describe('initalizations without data', function() {
+        element = fixture('basic');
+
+        it('should create an event when passed an integration object', function() {     
+        var element = fixture('working');
+          var promise = element.createEvent(integrationID,body);
+          promise.then(function(response){
+              //assert some stuff
+              done();
+          });
+          requests[0].respond(200, { "Content-Type": "application/json" },
+                                   '{"response":"response"}');
+        });
+      });
+      /* test('instantiating the element with configuration works', function() {
+          var element = fixture('configured');
+          assert.equal(element.is, 'integration-service');
+          assert.equal(element.viewsUrl, '/api/views');
+          assert.equal(element.predixZoneId, 'abc');
+          assert.equal(element.token, '123');
+          var promise = element.getIntegrations();
+          assert.typeOf(promise, 'object');
+        });
+        test('getIntegrations works without a query', function() {
+          var element = fixture('working');
+          var promise = element.getIntegrations();
+          assert.typeOf(promise, 'object');
+        });
+        test('getIntegrations works with a query', function() {
+          var element = fixture('working');
+          var promise = element.getIntegrations('/tags?values=report');
+          assert.typeOf(promise, 'object');
+        });
+        test('getIntegrationsByDeckId works with a deck ID', function() {
+          var element = fixture('working');
+          var promise = element.getIntegrationsBySystemId('abc');
+          assert.typeOf(promise, 'object');
+        });*/
+       /* test('deleteDeck works with a deck ID', function() {
+          var element = fixture('working');
+          var promise = element.deleteDeck('abc');
+          assert.typeOf(promise, 'object');
+        });
+        test('updateIntegration works with a integration object', function() {
+          var element = fixture('working');
+          var promise = element.updateIntegration({
+            id: 'abc'
+          });
+          assert.typeOf(promise, 'object');
+        });
+        test('updateIntegration works with an empty integration object', function() {
+          var element = fixture('working');
+          var promise = element.updateIntegration();
+          assert.typeOf(promise, 'object');
+        });*/
+      });
+    </script>
+  </body>
+</html>
